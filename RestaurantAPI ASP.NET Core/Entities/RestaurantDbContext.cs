@@ -8,8 +8,7 @@ namespace RestaurantAPI_ASP.NET_Core.Entities
 {
     public class RestaurantDbContext : DbContext
     {
-        private string _connectionString =
-            "Server=DESKTOP-I82GNCP;Database=RestaurantDb;Trusted_Connection=True";
+        public RestaurantDbContext(DbContextOptions<RestaurantDbContext> option) : base(option) { }
         public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Dish> Dishes { get; set; }
@@ -43,10 +42,6 @@ namespace RestaurantAPI_ASP.NET_Core.Entities
             modelBuilder.Entity<Role>()
                 .Property(r => r.Name)
                 .IsRequired();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_connectionString);
         }
     }
 }
