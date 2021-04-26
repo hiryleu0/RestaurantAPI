@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace RestaurantAPI_ASP.NET_Core.Services
@@ -11,7 +12,7 @@ namespace RestaurantAPI_ASP.NET_Core.Services
         RestaurantDto GetById(int id);
         IEnumerable<RestaurantDto> GetAll();
         int Create(CreateRestaurantDto dto);
-        void Delete(int id);
+        void Delete(int id );
         void Update(UpdateRestaurantDto dto, int id);
     }
 }

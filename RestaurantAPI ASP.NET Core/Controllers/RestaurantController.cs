@@ -8,6 +8,7 @@ using RestaurantAPI_ASP.NET_Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace RestaurantAPI_ASP.NET_Core.Controllers
@@ -37,8 +38,11 @@ namespace RestaurantAPI_ASP.NET_Core.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles ="Admin")]
+        [Authorize(Policy ="HasNationality")]
         public ActionResult CreateRestaurant([FromBody] CreateRestaurantDto dto)
         {
+            var userId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
             var id = _service.Create(dto);
             return Created($"/api/restaurant/{id}", null);
         }

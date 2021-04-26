@@ -21,6 +21,10 @@ namespace RestaurantAPI_ASP.NET_Core.Middleware
             {
                 await next.Invoke(context);
             }
+            catch(ForbidException e)
+            {
+                context.Response.StatusCode = 403;
+            }
             catch(NotFoundException e)
             {
                 context.Response.StatusCode = 404;
