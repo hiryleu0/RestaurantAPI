@@ -15,13 +15,41 @@ namespace RestaurantAPI_ASP.NET_Core
         }
         public void Seed()
         {
-            if(_context.Database.CanConnect())
-                if(!_context.Restaurants.Any())
+            if (_context.Database.CanConnect())
+            {
+                if(!_context.Roles.Any())
+                {
+                    var roles = GetRoles();
+                    _context.Roles.AddRange(roles);
+                    _context.SaveChanges();
+                }
+                if (!_context.Restaurants.Any())
                 {
                     var restaurants = GetRestaurants();
                     _context.Restaurants.AddRange(restaurants);
                     _context.SaveChanges();
                 }
+            }
+        }
+
+        private IEnumerable<Role> GetRoles()
+        {
+            var roles = new List<Role>()
+            {
+                new Role()
+                {
+                    Name="User"
+                },
+                new Role()
+                {
+                    Name="Manager"
+                },
+                new Role()
+                {
+                    Name="Admin"
+                }
+            };
+            return roles;
         }
 
         private IEnumerable<Restaurant> GetRestaurants()
