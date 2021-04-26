@@ -10,7 +10,7 @@ namespace RestaurantAPI_ASP.NET_Core.Services
     public interface IRestaurantService
     {
         RestaurantDto GetById(int id);
-        IEnumerable<RestaurantDto> GetAll();
+        PageResult<RestaurantDto> GetAll(RestaurantQuery restaurantQuery);
         int Create(CreateRestaurantDto dto);
         void Delete(int id );
         void Update(UpdateRestaurantDto dto, int id);

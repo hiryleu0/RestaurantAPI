@@ -8,7 +8,9 @@ using RestaurantAPI_ASP.NET_Core.Exceptions;
 using RestaurantAPI_ASP.NET_Core.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -41,16 +43,40 @@ namespace RestaurantAPI_ASP.NET_Core.Services
             if (restaurant is null) throw new NotFoundException("Not found to get");
             return _mapper.Map<RestaurantDto>(restaurant);
         }
-        public IEnumerable<RestaurantDto> GetAll()
+        public PageResult<RestaurantDto> GetAll(RestaurantQuery restaurantQuery)
         {
-            var restaurants = _dbContext
+
+            var baseQuery = _dbContext
                 .Restaurants
                 .Include(r => r.Address)
                 .Include(r => r.Dishes)
+                .Where(r => restaurantQuery.SearchPhase == null ||
+                    (r.Name.ToLower().Contains(restaurantQuery.SearchPhase.ToLower()) || r.Description.ToLower().Contains(restaurantQuery.SearchPhase.ToLower())));
+
+            if(string.IsNullOrEmpty(restaurantQuery.SortBy))
+            {
+                var columnSelector = new Dictionary<string, Expression<Func<Restaurant, object>>>
+                {
+                    {nameof(Restaurant.Name), r => r.Name },
+                    {nameof(Restaurant.Description), r => r.Description },
+                    {nameof(Restaurant.Category), r => r.Category }
+                };
+
+                var selectedColumn = columnSelector[restaurantQuery.SortBy];
+
+                baseQuery = restaurantQuery.SortDirection == SortDirection.ASC
+                    ? baseQuery.OrderBy(selectedColumn)
+                    : baseQuery.OrderByDescending(selectedColumn);
+            }
+
+            var restaurants = baseQuery
+                .Skip(restaurantQuery.ItemsPerPage * (restaurantQuery.PageNumber-1))
+                .Take(restaurantQuery.ItemsPerPage)
                 .ToList();
 
             var restaurantsDtos = _mapper.Map<List<RestaurantDto>>(restaurants);
-            return restaurantsDtos;
+            var result = new PageResult<RestaurantDto>(restaurantsDtos, baseQuery.Count(), restaurantQuery.ItemsPerPage, restaurantQuery.PageNumber);
+            return result;
         }
 
         public int Create(CreateRestaurantDto dto)
